@@ -35,6 +35,14 @@ class View
     login_data = {username: username, password: password}
   end
 
+  def self.incorrect_password
+    puts "Your username/password information was incorrect, please try again!"
+    login
+  end
+  def self.successful_login
+    puts "You have successfuly logged in!"
+  end
+
   def self.goodbye
     puts "goodbye"
   end

@@ -43,3 +43,8 @@ desc "Run the specs"
 RSpec::Core::RakeTask.new(:spec)
 
 task :default  => :specs
+
+desc "Populate Movie Table"
+task "set_movies" do
+  exec "ruby pulldata.rb"
+end
