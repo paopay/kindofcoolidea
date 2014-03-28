@@ -5,6 +5,7 @@ class CreateMovies < ActiveRecord::Migration
     create_table :movies do |t|
       t.string :title
       t.string :year
+      t.timestamps
     end
   end
 end
