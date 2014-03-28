@@ -1,6 +1,6 @@
-require_relative '../../config/application'
-require_relative '../models/movie'
-require_relative '../models/user'
+# require_relative '../../config/application'
+# require_relative '../models/movie'
+# require_relative '../models/user'
 
 
 
@@ -85,7 +85,7 @@ class View
   def self.display_user_movies(movies)
     puts ""
     movies.each_with_index do |movie, index|
-      puts "#{index + 1}. #{movie.title}"
+      puts "#{index + 1}. #{movie.title} (#{movie.year}"
     end
 
   end

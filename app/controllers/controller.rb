@@ -1,7 +1,7 @@
-require_relative '../../config/application'
-require_relative '../models/movie'
+# require_relative '../../config/application'
+# require_relative '../models/movie'
 require_relative '../models/user'
-require_relative '../models/watched_movie'
+# require_relative '../models/watched_movie'
 require_relative '../views/cool'
 require 'debugger'
 

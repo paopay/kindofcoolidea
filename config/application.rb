@@ -3,6 +3,7 @@ require 'sqlite3'
 require 'active_record'
 require 'logger'
 
+
 APP_ROOT = Pathname.new(File.expand_path(File.join(File.dirname(__FILE__), '..')))
 
 APP_NAME = APP_ROOT.basename.to_s
@@ -25,3 +26,9 @@ end
 
 ActiveRecord::Base.establish_connection :adapter  => 'sqlite3',
                                         :database => DB_PATH
+
+require_relative '../app/models/movie'
+require_relative '../app/models/user'
+require_relative '../app/models/watched_movie'
+require_relative '../app/controllers/controller'
+require_relative '../app/view/cool'
