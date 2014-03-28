@@ -43,14 +43,24 @@ class Controller
   def self.logged_in_user_commands(user)
     answer = View.logged_in_options
     if answer == 'list'
-      user.movies
+      movies = user.movies
+      View.display_user_movies(movies)
     elsif answer == 'add'
       movie = View.add_movie_to_user_list
-      potential_movies =Movie.where("title LIKE ?", movie)
-      View.list_potential_movies_to_add
-      # Get from model/database
-      # user.movies << movie
+      movie = '%' + movie + '%'
+      potential_movies = Movie.where("title LIKE ?", movie)
+      movie_to_add = View.list_potential_movies_to_add(potential_movies)
+
+      potential_movies.each_with_index do |movie, index|
+        user.movies << movie if index == (movie_to_add.to_i - 1)
+      end
+
+      View.movie_added(user)
+
+    else
+      exit
     end
+    logged_in_user_commands(user)
 
   end
 end
