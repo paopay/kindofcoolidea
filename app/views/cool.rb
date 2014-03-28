@@ -51,7 +51,7 @@ class View
   end
   def self.successful_login
     puts ""
-    puts "You have successfuly logged in!".colorize(ALERT)
+    puts "You have successfully logged in!".colorize(ALERT)
 
   end
 
