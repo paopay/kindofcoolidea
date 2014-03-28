@@ -90,6 +90,7 @@ class Controller
       movie_to_delete = user.movies[answer.to_i - 1]
       object_to_delete = WatchedMovie.where('user_id = ? and movie_id = ? ', user.id, movie_to_delete.id)
       WatchedMovie.delete(object_to_delete.first.id)
+      user.movies = user.movies.select { |movie| movie.id != object_to_delete.first.movie_id }
   end
 
 end
