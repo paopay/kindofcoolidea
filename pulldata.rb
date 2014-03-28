@@ -9,9 +9,11 @@ IMDB_LINK = 'ftp://ftp.fu-berlin.de/pub/misc/movies/database/movies.list.gz'
 
 GZIPFILE  = 'imdb_raw_movie_list.gz'              # constant: the name of the downloaded gzip file
 RAWFILE   = 'imdb_raw_movie.list'                 # constant: the name of the extracted gzip file
-CLEANFILE = 'imdb_movies.txt'                     # constant: the final version of the information
 
+CLEANFILE = 'imdb_movies.txt'                     # constant: the output textfile name
 DBNAME    = 'db/final_project_group4.db'          # constant: the database name
+
+DB        = true                                  # constant: output to DB ? db : file
 
 puts "file names established"
 
@@ -40,22 +42,22 @@ end
 
 ########################################### PROCESS DATA ###########################################
 
-moviedata = File.readlines(RAWFILE, encoding: "windows-1252:utf-8")   # read in the extracted file
+$moviedata = File.readlines(RAWFILE, encoding: "windows-1252:utf-8")   # read in the extracted file
 
 puts "extracted file loaded"
                                                   # we need to figure out the actual movie data is
-start_index = moviedata.index("="*11 + "\n") + 2  # the + 2 is to start 2 lines after the delimiter
-end_index  = moviedata.rindex("-"*80 + "\n") - 1  # the -1 is to stop 1 line before the delimeter
+start_index = $moviedata.index("="*11 + "\n") + 2 # the + 2 is to start 2 lines after the delimiter
+end_index  = $moviedata.rindex("-"*80 + "\n") - 1 # the -1 is to stop 1 line before the delimeter
 
 puts "data start/end points found"
 
-moviedata = moviedata[start_index..end_index]     # only keep the actual movie data
+$moviedata = $moviedata[start_index..end_index]   # only keep the actual movie data
 
 puts "fresh movie data extracted"
 
-moviedata = moviedata.reject do |line|            # go through the movies data and
+$moviedata = $moviedata.reject do |line|          # go through the movies data and
   line.include?('{')       ||                     # remove episodes
-  line.include?(' (V)')   ||                      # remove videos
+  line.include?(' (V)')    ||                     # remove videos
   line.include?(' (TV)')   ||                     # remove TV movies
   line.include?(' (VG)')   ||                     # remove video games
   /\-(\?{4}|\d\d\d\d)$/ =~ line                   # remove TV (has year range)
@@ -63,7 +65,7 @@ end
 
 puts "TV episodes, TV movies, and video games removed"
 
-moviedata = moviedata.map do |line|               # go through the data and
+$moviedata = $moviedata.map do |line|             # go through the data and
   line  = line.chomp                              # remove new line character at the end
   line  = line.sub(/\t+/, "|")                    # replace consecutive tabs with pipe
   line  = line.split("|")                         # split line into movie (year)|year
@@ -79,39 +81,45 @@ end
 
 puts "data cleaned"
 
-######################################## WRITE DATA TO FILE ########################################
+########################################### OUTPUT DATA ############################################
 
-# puts "attempting to write data to file"
+def output_to_file                                # to write to file
+  puts "attempting to write data to file"
 
-# if File.exists?(CLEANFILE)                        # if a previous version of the file exists
-#   File.delete(CLEANFILE)                          # delete it to write a fresh copy
-#   puts "old version of clean data deleted"
-# end
+  if File.exists?(CLEANFILE)                      # if a previous version of the file exists
+    File.delete(CLEANFILE)                        # delete it to write a fresh copy
+    puts "old version of clean data deleted"
+  end
 
-# File.open(CLEANFILE, "w") do |f|                  # open up the final data File
-#   moviedata.each do |movie|                       # and for each movie that we have cleaned
-#     f.puts movie.join("|")                        # write it to the file as: movie|year
-#   end
-# end
+  File.open(CLEANFILE, "w") do |f|                # open up the final data File
+    $moviedata.each do |movie|                    # and for each movie that we have cleaned
+      f.puts movie.join("|")                      # write it to the file as: movie|year
+    end
+  end
 
-# puts "SUCCESS! fresh clean data written to file: #{CLEANFILE}"
-
-######################################### WRITE DATA TO DB #########################################
-
-puts "attempting to write data to database"
-
-db = SQLite3::Database.new(DBNAME)
-
-db.execute("DROP TABLE IF EXISTS movies")
-
-moviedata.each do |data|
-  movie = data[0]
-  year  = data[1]
-
-  db.execute("INSERT INTO movies (title, year) VALUES (?, ?)", movie, year)
+  puts "SUCCESS! fresh clean data written to file: #{CLEANFILE}"
 end
 
-puts "SUCCESS! fresh clean data written to database: #{DBNAME}"
+def output_to_database                            # to write to database
+  puts "attempting to write data to database"
+
+  db = SQLite3::Database.new(DBNAME)              # create connection to database
+
+  db.execute("DROP TABLE IF EXISTS movies")       # drop movies table if already exists
+
+  db.execute( "CREATE TABLE movies ( title VARCHAR(255), year VARCHAR(255) )" )  # create table
+
+  $moviedata.each do |data|                       # go through the movie data
+    movie = data[0]                               # separate out movie
+    year  = data[1]                               #              and year
+
+    db.execute("INSERT INTO movies (title, year) VALUES (?, ?)", movie, year)  # put movie into db
+  end
+
+  puts "SUCCESS! fresh clean data written to database: #{DBNAME}"
+end
+
+DB ? output_to_database : output_to_file          # outputs based on flag
 
 ############################################# CLEANUP ##############################################
 

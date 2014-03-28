@@ -1,6 +1,7 @@
 require_relative '../../config/application'
 require_relative '../models/movie'
 require_relative '../models/user'
+require_relative '../models/watched_movie'
 require_relative '../views/cool'
 require 'debugger'
 
@@ -42,8 +43,9 @@ class Controller
 
   def self.logged_in_user_commands(user)
     answer = View.logged_in_options
+    movies = user.movies
     if answer == 'list'
-      movies = user.movies
+      # movies = user.movies
       View.display_user_movies(movies)
     elsif answer == 'add'
       movie = View.add_movie_to_user_list
@@ -56,6 +58,14 @@ class Controller
       end
 
       View.movie_added(user)
+
+    elsif answer == "delete"
+      View.display_user_movies(movies)
+      answer = View.delete_movie_from_user_list
+      movie_to_delete = user.movies[answer.to_i - 1]
+      object_to_delete = WatchedMovie.where('user_id = ? and movie_id = ? ', user.id, movie_to_delete.id)
+      puts "#{object_to_delete.first.id}"
+      WatchedMovie.delete(object_to_delete.first.id)
 
     else
       exit
