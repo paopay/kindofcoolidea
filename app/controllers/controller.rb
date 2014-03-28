@@ -21,7 +21,6 @@ class Controller
     when "login"
       # debugger
       login_data = View.login
-      p login_data
       User.login(login_data)
     when "register"
       new_user_data = View.register
@@ -42,13 +41,13 @@ class Controller
   end
 
   def self.logged_in_user_commands(user)
-    puts "Type 'list' to view all of the moviesyou have watched. Type 'add' to add a movie to your list that you have recently watched."
-    answer = gets.chomp!
+    answer = View.logged_in_options
     if answer == 'list'
       user.movies
     elsif answer == 'add'
-      puts "type in the movie title"
-      movie = gets.chomp!
+      movie = View.add_movie_to_user_list
+      potential_movies =Movie.where("title LIKE ?", movie)
+      View.list_potential_movies_to_add
       # Get from model/database
       # user.movies << movie
     end
