@@ -7,7 +7,7 @@ require_relative '../models/user'
 class View
   def self.welcome
     puts ""
-    puts "Welcome to Paolo's kind of cool idea!!!"
+    puts "Welcome to Paolo's kind of really cool idea!!!"
   end
 
   def self.options
@@ -53,7 +53,7 @@ class View
 
   def self.logged_in_options
     puts ""
-    puts "Type 'list' to view all of the movies you have watched.\n Type 'add' to add a movie to your list that you have recently watched.\n Type 'delete' to remove a movie from your list.\n Type 'logout' to log out and exit this program."
+    puts "Type 'list' to view all of the movies you have watched.\nType 'add' to add a movie to your list that you have recently watched.\nType 'delete' to remove a movie from your list.\nType 'logout' to log out and exit this program."
     answer = gets.chomp!
     logged_in_options unless answer == 'list' or answer == 'add' or answer == 'logout' or answer == 'delete'
     return answer
@@ -94,6 +94,11 @@ class View
     puts ""
     puts "#{user.movies[-1].title} has been added to your list!"
 
+  end
+
+  def self.no_movies
+    puts ""
+    puts "You do not have any movies yet."
   end
 
   def self.goodbye
