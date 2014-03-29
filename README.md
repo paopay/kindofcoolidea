@@ -3,7 +3,7 @@ Group 4 Final Project
 
 The Kind of Cool Idea
 =====================
-brought to you by Paolo, Nina, Ravi, Rori, and Tyler
+brought to you by Nina, Paolo, Ravi, Rori, and Tyler
 ----------------------------------------------------
 
 ### What is it?
