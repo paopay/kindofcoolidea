@@ -1,6 +1,7 @@
-require_relative '../../config/application'
-require_relative '../models/movie'
+# require_relative '../../config/application'
+# require_relative '../models/movie'
 require_relative '../models/user'
+# require_relative '../models/watched_movie'
 require_relative '../views/cool'
 require 'debugger'
 
@@ -25,7 +26,8 @@ class Controller
     when "register"
       new_user_data = View.register
       User.create(new_user_data)
-     "Please enter 'login' or 'register'. Don't fail."
+      run
+
     end
   end
 
@@ -40,13 +42,33 @@ class Controller
     logged_in_user_commands(user)
   end
 
+
   def self.logged_in_user_commands(user)
     answer = View.logged_in_options
+    @movies = user.movies
     if answer == 'list'
-      movies = user.movies
-      View.display_user_movies(movies)
+      list(user)
     elsif answer == 'add'
-      movie = View.add_movie_to_user_list
+      add(user)
+    elsif answer == "delete"
+      delete(user)
+    else
+      exit
+    end
+    logged_in_user_commands(user)
+
+  end
+
+  def self.list(user)
+    if user.movies.length == 0
+        View.no_movies
+      end
+      # movies = user.movies
+      View.display_user_movies(@movies)
+  end
+
+  def self.add(user)
+    movie = View.add_movie_to_user_list
       movie = '%' + movie + '%'
       potential_movies = Movie.where("title LIKE ?", movie)
       movie_to_add = View.list_potential_movies_to_add(potential_movies)
@@ -56,13 +78,21 @@ class Controller
       end
 
       View.movie_added(user)
-
-    else
-      exit
-    end
-    logged_in_user_commands(user)
-
   end
+
+  def self.delete(user)
+    if user.movies.length == 0
+        View.no_movies
+        return logged_in_user_commands(user)
+      end
+      View.display_user_movies(@movies)
+      answer = View.delete_movie_from_user_list
+      movie_to_delete = user.movies[answer.to_i - 1]
+      object_to_delete = WatchedMovie.where('user_id = ? and movie_id = ? ', user.id, movie_to_delete.id)
+      WatchedMovie.delete(object_to_delete.first.id)
+      user.movies = user.movies.select { |movie| movie.id != object_to_delete.first.movie_id }
+  end
+
 end
 
 Controller.run
